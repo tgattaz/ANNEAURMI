@@ -4,7 +4,9 @@ import java.util.concurrent.Semaphore;
 
 import anneau.exo4rmi.JetonInterface;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -18,28 +20,27 @@ import java.rmi.server.UnicastRemoteObject;
  * @author nicolas
  *
  */
-public class GestionJeton extends UnicastRemoteObject implements JetonInterface,Runnable {
+public class GestionJeton extends UnicastRemoteObject implements JetonInterface {
 
 	Semaphore debutsc;
 	Semaphore finsc;
 	
-	String idSuccesseur;
-
+	
 	boolean initjeton;
 	
 	Jeton lejeton = null;
-
+	public JetonInterface lol = null;
 	/**
 	 * Constructeur
 	 * @param debutsc
 	 * @param finsc
 	 * @param veutentrer Booleen
 	 */
-	public GestionJeton(Semaphore debutsc, Semaphore finsc, String successeur, boolean initjeton) throws RemoteException {
+	public GestionJeton(Semaphore debutsc, Semaphore finsc, boolean initjeton) throws RemoteException {
 		this.debutsc = debutsc;
 		this.finsc = finsc;
-		this.idSuccesseur = successeur;
-		this.initjeton = initjeton;
+
+		
 	}
 
 	/**
@@ -47,14 +48,14 @@ public class GestionJeton extends UnicastRemoteObject implements JetonInterface,
 	 */
 	public void envoyerJeton(Jeton jeton) throws RemoteException {
 		try {
-			System.out.println("envoyer jeton dist");
+			
 			if(ProgrammeSite.veutentrer == true) {
 				debutsc.release();
+				
 				finsc.acquire();
 			}
+			
 			//ATTENTION
-			System.out.println("envoyer jeton dist 2");
-			JetonInterface lol = (JetonInterface) Naming.lookup("rmi://localhost/envoyerJeton" + idSuccesseur) ;
 			lol.envoyerJeton(jeton);
 			
 		} catch (Exception e) {
@@ -63,29 +64,4 @@ public class GestionJeton extends UnicastRemoteObject implements JetonInterface,
 		
 	}
 	
-	public void run() { 
-	
-			
-			try {
-				Thread.sleep(4000);// 4 secondes
-
-			if(this.initjeton==true) {
-				lejeton = new Jeton();
-				
-				this.initjeton=false;
-				envoyerJeton(lejeton);
-			}
-			
-			
-
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-
-	}
-
 }

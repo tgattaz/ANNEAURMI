@@ -24,6 +24,7 @@ public class Traitement extends Thread {
 	int compteur;
 	String serveur;
 	int port;
+	String id_site;
 
 	/**
 	 * Constructeur
@@ -31,12 +32,13 @@ public class Traitement extends Thread {
 	 * @param finsc Semaphore
 	 * @param veutentrer Booleen
 	 */
-	public Traitement(Semaphore debutsc, Semaphore finsc, String serveur, int port) {
+	public Traitement(Semaphore debutsc, Semaphore finsc, String serveur, int port, String id_site) {
 		this.debutsc = debutsc;
 		this.finsc = finsc;
 		this.compteur = 0;
 		this.serveur = serveur;
 		this.port = port;
+		this.id_site = id_site;
 	}
 
 	/**
@@ -52,7 +54,7 @@ public class Traitement extends Thread {
 			Random r = new Random();
 			int alea = 0;
 			
-			while(compteur < 3) {
+			while(compteur < 10) {
 				/* du code quelconque */
 				alea = 1000 + r.nextInt(9000);
 				Thread.sleep(alea); // entre 1 et 10 secondes
@@ -69,7 +71,7 @@ public class Traitement extends Thread {
 
 				time = System.currentTimeMillis();
 				
-				String theLine = time+" "+this.getName()+" : "+this.compteur;
+				String theLine = time+" "+this.getName()+", site : "+id_site;
 				byte[] data = theLine.getBytes();
 				DatagramPacket theOutput = new DatagramPacket(data, data.length, receiver, this.port);
 				System.out.println(this.getName()+" envoi "+theLine);
